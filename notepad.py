@@ -301,7 +301,7 @@ class Notepad(tb.Window):
         
         super().__init__(themename="darkly")
         
-        self.title("📝 Modern Notepad Pro")
+        self.title("Notepad")
         self.geometry("1200x700")
         self.minsize(800, 500)
         self.current_file = None
@@ -333,15 +333,13 @@ class Notepad(tb.Window):
         if sys.platform == "win32":
             try:
                 # Nastavení ikonky
-                if os.path.exists("icon.ico"):
-                    self.iconbitmap("icon.ico")
-                elif os.path.exists("icon.png"):
-                    # Pro PNG ikonky
-                    import PIL.Image
-                    import PIL.ImageTk
-                    icon_image = PIL.Image.open("icon.png")
-                    icon_photo = PIL.ImageTk.PhotoImage(icon_image)
-                    self.iconphoto(True, icon_photo)
+                try:
+                    self.iconbitmap("notepad.ico")
+                except:
+                    pass  # Launch without icon
+                
+                # Počkej na vytvoření okna
+                self.update()
                 
                 # Tmavý title bar pro Windows 10/11
                 DWMWA_USE_IMMERSIVE_DARK_MODE = 20
@@ -349,21 +347,15 @@ class Notepad(tb.Window):
                 if hwnd == 0:
                     hwnd = self.winfo_id()
                 
+                value = ctypes.c_int(1)
                 ctypes.windll.dwmapi.DwmSetWindowAttribute(
-                    hwnd,
-                    DWMWA_USE_IMMERSIVE_DARK_MODE,
-                    ctypes.byref(ctypes.c_int(1)),
-                    ctypes.sizeof(ctypes.c_int)
+                    hwnd, 
+                    DWMWA_USE_IMMERSIVE_DARK_MODE, 
+                    ctypes.byref(value), 
+                    ctypes.sizeof(value)
                 )
-                
-                # Alternativní metoda pro starší verze Windows
-                try:
-                    ctypes.windll.uxtheme.SetWindowTheme(hwnd, "DarkMode_Explorer", None)
-                except:
-                    pass
                     
             except Exception as e:
-                print(f"Could not set dark mode or icon: {e}")
                 pass
 
     def load_config(self):
@@ -621,7 +613,7 @@ class Notepad(tb.Window):
     def update_title(self):
         name = os.path.basename(self.current_file) if self.current_file else "Untitled"
         star = "*" if self.file_modified else ""
-        self.title(f"{star}{name} - Modern Notepad Pro")
+        self.title(f"{star}{name} - Notepad")
 
     def update_statusbar(self, event=None):
         if not hasattr(self, 'statusbar'):
@@ -1123,34 +1115,9 @@ SETTINGS:
         messagebox.showinfo("Keyboard Shortcuts", shortcuts_text)
 
     def show_about(self):
-        about_text = """Modern Notepad Pro v3.0
+        about_text = """Notepad v1.1
 
-Advanced text editor created in Python with modern interface.
-
-New features in version 3.0:
-• Comprehensive settings dialog with preview
-• Auto-save with indicator
-• Recent files with persistence
-• Toolbar with quick buttons
-• Current line highlighting
-• Auto-indentation
-• Find and replace dialog
-• Word count and statistics
-• Case conversion
-• Dark mode for Windows
-• Extended keyboard shortcuts
-
-Main features:
-• Modern interface with multiple themes
-• Support for various formats and encodings
-• Unlimited undo/redo operations
-• Advanced search and replace
-• Customizable font and size
-• Comprehensive settings with preview
-• Status bar with detailed information
-• Automatic features (save, indent)
-
-Created using ttkbootstrap and modern Python technologies."""
+Text editor created in Python by MichalBr."""
 
         messagebox.showinfo("About", about_text)
 
